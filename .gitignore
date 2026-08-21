@@ -1,0 +1,9 @@
+node_modules/
+.env
+dist/
+.next/
+out/
+.vscode/
+.idea/
+backend/data/meetings.json
+backend/uploads/
