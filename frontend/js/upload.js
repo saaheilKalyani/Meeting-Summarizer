@@ -74,6 +74,11 @@ function showFilePreview(file) {
   filePreviewName.textContent = file.name;
   filePreviewSize.textContent = formatFileSize(file.size);
   filePreview.hidden = false;
+  // animateFilePreviewIn() is animations.js's. That file loads after this
+  // one, but showFilePreview() only ever runs later, from an event
+  // listener — by the time a user can pick a file, every deferred script
+  // has already run and animateFilePreviewIn is defined globally.
+  animateFilePreviewIn();
 }
 
 function handleFile(file) {

@@ -421,11 +421,21 @@ section > * {
   text-align: center;
 }
 
+/* Same [hidden]-override need as .file-preview above — author-origin
+   `display: flex` otherwise beats the UA stylesheet's [hidden] rule. */
+.processing[hidden] {
+  display: none;
+}
+
 .equalizer {
   display: flex;
   align-items: flex-end;
   gap: 6px;
   height: 48px;
+}
+
+.equalizer[hidden] {
+  display: none;
 }
 
 .equalizer span {
@@ -440,6 +450,18 @@ section > * {
   color: var(--text-muted);
   font-family: var(--font-heading);
   letter-spacing: 0.02em;
+}
+
+/* Submission-failure state, built by main.js inside #processing. */
+.processing-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.processing-error[hidden] {
+  display: none;
 }
 
 /* ==========================================================================
