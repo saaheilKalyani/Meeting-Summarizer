@@ -6,7 +6,7 @@
 // hand with MAX_UPLOAD_MB in backend/.env.example (currently 50).
 const MAX_UPLOAD_MB = 50;
 const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
-const ALLOWED_EXTENSIONS = ['.mp3', '.wav', '.m4a', '.webm'];
+const ALLOWED_EXTENSIONS = ['.mp3', '.wav', '.m4a', '.webm', '.mp4'];
 
 const dropzone = document.getElementById('dropzone');
 const audioInput = document.getElementById('audio-input');
@@ -40,7 +40,7 @@ function formatFileSize(bytes) {
 function validateFile(file) {
   const extension = getExtension(file.name);
   if (!ALLOWED_EXTENSIONS.includes(extension)) {
-    return `Unsupported file type "${extension || 'unknown'}". Allowed types: mp3, wav, m4a, webm.`;
+    return `Unsupported file type "${extension || 'unknown'}". Allowed types: mp3, wav, m4a, webm, mp4.`;
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     return `File is too large (${formatFileSize(file.size)}). Max size is ${MAX_UPLOAD_MB}MB.`;

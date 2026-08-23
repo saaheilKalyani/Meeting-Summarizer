@@ -6,7 +6,7 @@ const { UPLOADS_DIR } = require('../services/storageService');
 
 const MAX_UPLOAD_MB = Number(process.env.MAX_UPLOAD_MB) || 50;
 
-const ALLOWED_EXTENSIONS = new Set(['.mp3', '.wav', '.m4a', '.webm']);
+const ALLOWED_EXTENSIONS = new Set(['.mp3', '.wav', '.m4a', '.webm', '.mp4']);
 const ALLOWED_MIME_TYPES = new Set([
   'audio/mpeg',
   'audio/mp3',
@@ -17,6 +17,10 @@ const ALLOWED_MIME_TYPES = new Set([
   'audio/mp4',
   'audio/x-m4a',
   'audio/m4a',
+  // Video containers — Groq's Whisper endpoint accepts these directly and
+  // extracts the audio track server-side, so no local extraction needed.
+  'video/mp4',
+  'video/webm',
 ]);
 
 const storage = multer.diskStorage({
@@ -40,7 +44,7 @@ function fileFilter(req, file, cb) {
 
   if (!extOk || !mimeOk) {
     return cb(new ValidationError(
-      `Unsupported audio file type: "${file.originalname}" (${file.mimetype}). Allowed types: mp3, wav, m4a, webm.`,
+      `Unsupported file type: "${file.originalname}" (${file.mimetype}). Allowed types: mp3, wav, m4a, webm, mp4.`,
     ));
   }
 

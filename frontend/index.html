@@ -52,17 +52,17 @@
     <section id="upload" class="upload">
       <div class="section-heading">
         <h2>Upload your meeting</h2>
-        <p>MP3, WAV, M4A, or WEBM — up to 50MB.</p>
+        <p>MP3, WAV, M4A, WEBM, MP4 — up to 25MB. Video files count against the same limit and will hit it sooner than audio-only files of the same length.</p>
       </div>
 
       <form id="upload-form" class="upload-card" novalidate>
         <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-describedby="dropzone-hint">
-          <input type="file" id="audio-input" name="audio" accept=".mp3,.wav,.m4a,.webm,audio/*" class="dropzone__input" hidden>
+          <input type="file" id="audio-input" name="audio" accept=".mp3,.wav,.m4a,.webm,.mp4,audio/*,video/*" class="dropzone__input" hidden>
           <svg class="dropzone__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 16V4M12 4L7 9M12 4l5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="dropzone__title">Drag &amp; drop your audio file here</p>
+          <p class="dropzone__title">Drag &amp; drop your meeting recording here</p>
           <p class="dropzone__hint" id="dropzone-hint">or click to browse</p>
         </div>
 
@@ -217,7 +217,7 @@
   </main>
 
   <footer class="site-footer">
-    <p>Built for the Meeting Summarizer assignment &mdash; transcript &amp; summary generated with OpenAI Whisper + Gemini.</p>
+    <p>Built for the Meeting Summarizer assignment &mdash; transcript &amp; summary generated with Groq Whisper + Gemini.</p>
   </footer>
 
   <script src="js/api.js" defer></script>

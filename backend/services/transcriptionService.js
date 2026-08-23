@@ -21,6 +21,11 @@ async function transcribeAudio(filePath) {
   const form = new FormData();
   form.append('file', new Blob([audioBuffer]), filename);
   form.append('model', process.env.GROQ_MODEL || 'whisper-large-v3');
+  // Without this, Whisper's language auto-detection can guess wrong on short
+  // or noisy clips — a real test came back fully transcribed in Arabic for
+  // English audio. Forcing English here assumes meetings are in English;
+  // revisit if that assumption stops holding.
+  form.append('language', 'en');
   form.append('response_format', 'verbose_json');
   form.append('timestamp_granularities[]', 'word');
 

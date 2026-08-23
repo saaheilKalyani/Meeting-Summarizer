@@ -13,7 +13,7 @@ Upload a meeting recording and get back a transcript, a summary, key decisions, 
 
 - **Frontend**: plain HTML/CSS/JS, no bundler, no framework. [GSAP 3.15.0](https://gsap.com) + ScrollTrigger via the jsDelivr CDN, Space Grotesk + Inter via the Google Fonts CDN.
 - **Backend**: Node.js (built and tested on v24), Express, multer — the only two npm dependencies. Pinned in `backend/package.json` as `express@^4.19.0` and `multer@^2.2.0`; currently resolving to `express@4.22.2` / `multer@2.2.0` per `package-lock.json`.
-- **ASR**: OpenAI Whisper (`whisper-1`), called with Node's built-in `fetch`/`FormData`/`Blob` — no `openai` SDK.
+- **ASR**: Groq Whisper (`whisper-large-v3`), called with Node's built-in `fetch`/`FormData`/`Blob` — no SDK.
 - **LLM**: Google Gemini (`gemini-2.5-flash` by default, overridable), called with `fetch` — no `@google/generative-ai` SDK.
 - **Storage**: a flat JSON file (`backend/data/meetings.json`), audio saved to `backend/uploads/`. Both are created automatically on first run and are git-ignored.
 
@@ -30,7 +30,7 @@ backend/server.js
    │
    ├─ middleware/upload.js            validates the file, saves it to uploads/<id>.<ext>
    ├─ services/transcriptionService.js
-   │      fetch() ──▶ OpenAI Whisper (verbose_json, word-level timestamps)
+   │      fetch() ──▶ Groq Whisper (verbose_json, word-level timestamps)
    │      then a pause-based heuristic splits the words into speaker turns
    ├─ services/summaryService.js
    │      fetch() ──▶ Google Gemini (structured JSON output)
@@ -51,7 +51,7 @@ On the frontend, `frontend/js/main.js` is the orchestrator: it owns a small `idl
 Requires **Node.js 20.6+** (the start script uses Node's native `--env-file` flag instead of `dotenv`).
 
 1. `cd backend && npm install`
-2. `cp .env.example .env`, then fill in `OPENAI_API_KEY` and `GEMINI_API_KEY`
+2. `cp .env.example .env`, then fill in `GROQ_API_KEY` and `GEMINI_API_KEY`
 3. `npm start`
 4. Open `http://localhost:3000` (or whatever `PORT` is set to) — the frontend is served automatically, nothing separate to run
 
@@ -60,10 +60,11 @@ Requires **Node.js 20.6+** (the start script uses Node's native `--env-file` fla
 | Variable | Purpose | Default |
 |---|---|---|
 | `PORT` | Express port (serves both the frontend and the API) | `3000` |
-| `OPENAI_API_KEY` | Whisper transcription | — (required) |
+| `GROQ_API_KEY` | Groq Whisper transcription | — (required) |
+| `GROQ_MODEL` | Groq Whisper model name | `whisper-large-v3` |
 | `GEMINI_API_KEY` | Summary / decisions / action-item generation | — (required) |
 | `GEMINI_MODEL` | Gemini model name — verify it's still current at [ai.google.dev/gemini-api/docs/models](https://ai.google.dev/gemini-api/docs/models) before relying on the default | `gemini-2.5-flash` |
-| `MAX_UPLOAD_MB` | multer's file-size limit | `50` |
+| `MAX_UPLOAD_MB` | multer's file-size limit (matches Groq's free-tier file size cap; raise it if you're on their paid dev tier) | `25` |
 
 ## API Documentation
 
@@ -99,7 +100,7 @@ Errors — always `{ "error": "message" }`:
 | Status | Cause |
 |---|---|
 | `400` | No file attached, unsupported file type, or file exceeds `MAX_UPLOAD_MB` |
-| `502` | The Whisper or Gemini request failed, or Gemini returned malformed JSON |
+| `502` | The Groq or Gemini request failed, or Gemini returned malformed JSON |
 | `500` | Unexpected server error |
 
 ### `GET /api/meetings`
@@ -142,7 +143,7 @@ Extract the summary, decisions, and action items as JSON per the schema above.
 
 ## Demo Notes
 
-1. Upload a short real recording and let it run through to a real result — this is the one thing that can't be faked, since it needs live `OPENAI_API_KEY` / `GEMINI_API_KEY` credentials.
+1. Upload a short real recording and let it run through to a real result — this is the one thing that can't be faked, since it needs live `GROQ_API_KEY` / `GEMINI_API_KEY` credentials.
 2. Narrate the flow as it happens: hero → upload (drag-and-drop or click-to-browse) → processing (equalizer bars + the four cycling status phases) → results.
 3. Scroll through the results section — transcript (speaker avatars, alternating row tint, timestamps), then the Summary / Key Decisions / Action Items cards.
 4. Click a card in the "Past meetings" row and show it reloading that meeting's results instantly, with no re-processing.

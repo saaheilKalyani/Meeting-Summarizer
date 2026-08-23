@@ -12,6 +12,7 @@ Respond with ONLY valid JSON, no prose, no markdown fences, matching this shape:
   "decisions": string[],
   "actionItems": [ { "owner": string | null, "task": string, "dueDate": string | null } ]
 }
+Always write the summary, decisions, and action item text in English, regardless of what language the transcript itself is in.
 Only include a decision or action item if the transcript clearly supports it. Do not invent names or dates.`;
 
 function formatMs(ms) {

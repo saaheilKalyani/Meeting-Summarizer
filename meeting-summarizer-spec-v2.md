@@ -9,7 +9,7 @@ This version is built directly against the two documents you shared: the **Assig
 | Input: meeting audio files | Upload endpoint accepts mp3/wav/m4a/webm |
 | Output: transcript + summary + action items | All three produced and rendered; key decisions included too (explicitly named in the brief's own LLM prompt example) |
 | Optional frontend to upload & view | Built — one animated page, exceeds the "optional" bar for the job-impression goal you mentioned |
-| ASR: Google / Azure / OpenAI Whisper / etc. | **OpenAI Whisper**, explicitly named in the brief |
+| ASR: Google / Azure / OpenAI Whisper / etc. | **Groq Whisper** — the same Whisper model the brief names, hosted by Groq instead of OpenAI directly |
 | Backend to store & process data | Express + JSON file storage (`data/meetings.json`) |
 | LLM for summary generation | Gemini, called via raw REST `fetch` (no SDK) |
 | No extra modules / native whenever possible | Only 2 npm packages total: `express`, `multer`. No ASR/LLM SDK, no dotenv (uses Node's native `--env-file`) |
@@ -43,7 +43,7 @@ This version is built directly against the two documents you shared: the **Assig
       │                     decisions + action items                │  │
       │                                                              │  │
       │                                          1. save audio ──────┘  │
-      │                                          2. fetch() → Whisper API ──▶ OpenAI Whisper
+      │                                          2. fetch() → Whisper API ──▶ Groq Whisper
       │                                             (verbose_json, word     │  (transcription,
       │                                              timestamps)            │   word timestamps)
       │                                          3. heuristic speaker split │
@@ -156,6 +156,7 @@ Errors: `400` (missing/invalid/too-large file), `502` (Whisper failure), `502` (
 const form = new FormData();
 form.append('file', new Blob([audioBuffer]), filename);
 form.append('model', process.env.GROQ_MODEL || 'whisper-large-v3');
+form.append('language', 'en'); // force English — auto-detect can guess wrong
 form.append('response_format', 'verbose_json');
 form.append('timestamp_granularities[]', 'word');
 
@@ -168,7 +169,7 @@ const { words, duration } = await res.json();
 // heuristic: new speaker whenever gap between word.end and next word.start > 1.2s
 ```
 
-Groq's endpoint is OpenAI-compatible in request shape, and `response_format: 'verbose_json'` + `timestamp_granularities[]: 'word'` is the same combination OpenAI requires for word-level timestamps. The response shape above (`words: [{ word, start, end }]` plus a top-level `duration`) is assumed to match OpenAI's, per Groq's docs — but this hasn't been confirmed against a real Groq response yet (no key to test with), so verify it during the first real end-to-end run rather than trusting it permanently.
+Groq's endpoint is OpenAI-compatible in request shape, and `response_format: 'verbose_json'` + `timestamp_granularities[]: 'word'` is the same combination OpenAI requires for word-level timestamps. The response shape above (`words: [{ word, start, end }]` plus a top-level `duration`) is assumed to match OpenAI's, per Groq's docs — but this hasn't been confirmed against a real Groq response yet (no key to test with), so verify it during the first real end-to-end run rather than trusting it permanently. `language: 'en'` forces English output — auto-detection guessed wrong on a real test (a fully Arabic transcript came back for English audio), so this isn't optional.
 
 This uses Node 18+'s global `fetch`/`FormData`/`Blob` — zero dependencies for the ASR call itself. The heuristic speaker split is a plain function over the `words` array, alternating "Speaker 1"/"Speaker 2" labels — clearly documented in the README as an approximation, not true diarization.
 
@@ -278,7 +279,7 @@ backend/uploads/
 ## Tech Stack
 - Frontend: HTML/CSS/JS, GSAP (no build step)
 - Backend: Node.js, Express, multer only
-- ASR: OpenAI Whisper (raw REST via fetch)
+- ASR: Groq Whisper (raw REST via fetch)
 - LLM: Google Gemini (raw REST via fetch)
 
 ## Architecture Overview
@@ -292,7 +293,7 @@ backend/uploads/
 
 ## Setup Instructions
 1. cd backend && npm install
-2. cp .env.example .env, fill in OPENAI_API_KEY and GEMINI_API_KEY
+2. cp .env.example .env, fill in GROQ_API_KEY and GEMINI_API_KEY
 3. npm start
 4. open http://localhost:3000 — frontend is served automatically, nothing separate to run
 

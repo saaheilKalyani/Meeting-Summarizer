@@ -201,6 +201,12 @@ section > * {
   inset: 0;
   overflow: hidden;
   z-index: 0;
+  /* Overrides the generic `section > *` rule (max-width + auto margins),
+     which otherwise caps this full-bleed decorative layer to the same
+     1100px centered column as the section's actual content, leaving large
+     blob-free margins on wide viewports instead of spanning edge-to-edge. */
+  max-width: none;
+  margin: 0;
 }
 
 .blob {
