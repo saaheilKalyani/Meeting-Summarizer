@@ -98,8 +98,21 @@ function renderSummary(summary) {
   summaryText.textContent = summary;
 }
 
+function renderEmptyState(listEl, className, message) {
+  const empty = document.createElement('li');
+  empty.className = className;
+  empty.style.color = 'var(--text-muted)';
+  empty.textContent = message;
+  listEl.appendChild(empty);
+}
+
 function renderDecisions(decisions) {
   decisionsList.replaceChildren();
+
+  if (decisions.length === 0) {
+    renderEmptyState(decisionsList, 'decisions-list__empty', 'No key decisions were identified.');
+    return;
+  }
 
   for (const decision of decisions) {
     const item = document.createElement('li');
@@ -117,6 +130,11 @@ function renderDecisions(decisions) {
 
 function renderActionItems(actionItems) {
   actionsList.replaceChildren();
+
+  if (actionItems.length === 0) {
+    renderEmptyState(actionsList, 'actions-list__empty', 'No action items were identified.');
+    return;
+  }
 
   for (const action of actionItems) {
     const item = document.createElement('li');
