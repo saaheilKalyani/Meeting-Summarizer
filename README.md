@@ -2,9 +2,14 @@
 
 Upload a meeting recording and get back a transcript, a summary, key decisions, and action items — automatically.
 
+> ### 🎥 Watch the demo video
+> **[Watch on Google Drive](https://drive.google.com/file/d/1VH1p6TV2NPxGBu0xVUW4JgQ9qIK4dkmQ/view?usp=drive_link)** — see the full app
+> in action (upload → transcript → summary → decisions → action items)
+> without cloning or running the project yourself.
+
 ## Features
 
-- Upload an audio recording (`mp3`, `wav`, `m4a`, `webm`) and get a full transcript, a concise summary, key decisions, and action items.
+- Upload an audio or video recording (`mp3`, `wav`, `m4a`, `webm`, `mp4`) and get a full transcript, a concise summary, key decisions, and action items.
 - Transcript is split into speaker turns and labeled "Speaker 1" / "Speaker 2" (see [Known Limitations](#known-limitations) — this is a heuristic, not real diarization).
 - Past meetings row: previously processed meetings are listed and clickable, reloading their results without re-processing.
 - Single animated one-page frontend (hero, upload, processing, results, past meetings) — no build step, no framework.
@@ -70,7 +75,7 @@ Requires **Node.js 20.6+** (the start script uses Node's native `--env-file` fla
 
 ### `POST /api/meetings`
 
-`multipart/form-data`, one field: `audio` (`.mp3` / `.wav` / `.m4a` / `.webm`, ≤ `MAX_UPLOAD_MB`).
+`multipart/form-data`, one field: `audio` (`.mp3` / `.wav` / `.m4a` / `.webm` / `.mp4`, ≤ `MAX_UPLOAD_MB`).
 
 Success — `200`:
 
@@ -129,6 +134,7 @@ Respond with ONLY valid JSON, no prose, no markdown fences, matching this shape:
   "decisions": string[],
   "actionItems": [ { "owner": string | null, "task": string, "dueDate": string | null } ]
 }
+Always write the summary, decisions, and action item text in English, regardless of what language the transcript itself is in.
 Only include a decision or action item if the transcript clearly supports it. Do not invent names or dates.
 ```
 
