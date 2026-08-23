@@ -1,0 +1,90 @@
+/* ==========================================================================
+   Invalid-file shake
+   A discrete, one-shot reaction to bad input (not an ambient loop), so it's
+   left out of the prefers-reduced-motion guard below — it fires once, not
+   on a timer. Triggered later by JS via the .dropzone--invalid class.
+   ========================================================================== */
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+.dropzone--invalid {
+  animation: shake 500ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ==========================================================================
+   Ambient / looping animations
+   Everything below runs only when the user hasn't asked for reduced motion.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ---- Hero gradient blobs, drifting ---- */
+
+  @keyframes blob-drift-a {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(40px, 30px) scale(1.08); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes blob-drift-b {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(-35px, 25px) scale(0.94); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  .blob--one {
+    animation: blob-drift-a 16s ease-in-out infinite;
+  }
+
+  .blob--two {
+    animation: blob-drift-b 20s ease-in-out infinite;
+  }
+
+  .blob--three {
+    animation: blob-drift-a 24s ease-in-out infinite reverse;
+  }
+
+  /* ---- Processing equalizer / waveform bars ---- */
+
+  @keyframes eqbar {
+    0%, 100% { height: 12px; }
+    50%      { height: 44px; }
+  }
+
+  .equalizer span {
+    animation: eqbar 1s ease-in-out infinite;
+  }
+
+  .equalizer span:nth-child(1) { animation-delay: 0ms; }
+  .equalizer span:nth-child(2) { animation-delay: 120ms; }
+  .equalizer span:nth-child(3) { animation-delay: 240ms; }
+  .equalizer span:nth-child(4) { animation-delay: 360ms; }
+  .equalizer span:nth-child(5) { animation-delay: 480ms; }
+
+  /* ---- Pulsing CTA glow ---- */
+
+  @keyframes cta-glow-pulse {
+    0%, 100% { box-shadow: 0 12px 30px -12px rgba(99, 102, 241, 0.65); }
+    50%      { box-shadow: 0 16px 46px -10px rgba(99, 102, 241, 0.95); }
+  }
+
+  .btn--glow {
+    animation: cta-glow-pulse 2.6s ease-in-out infinite;
+  }
+
+  /* ---- Hero scroll cue, bouncing ---- */
+
+  @keyframes scroll-cue-bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%      { transform: translate(-50%, 8px); }
+  }
+
+  .scroll-cue {
+    animation: scroll-cue-bounce 1.8s ease-in-out infinite;
+  }
+}

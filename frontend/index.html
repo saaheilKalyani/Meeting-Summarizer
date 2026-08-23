@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meeting Summarizer — Turn Meetings into Clear Summaries &amp; Actions</title>
+  <meta name="description" content="Upload a meeting recording and get a transcript, summary, key decisions, and action items automatically.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#upload">Skip to upload</a>
+
+  <main id="main">
+
+    <!-- ============== HERO ============== -->
+    <section id="hero" class="hero">
+      <div class="hero__blobs" aria-hidden="true">
+        <span class="blob blob--one"></span>
+        <span class="blob blob--two"></span>
+        <span class="blob blob--three"></span>
+      </div>
+
+      <div class="hero__content">
+        <p class="hero__eyebrow">AI Meeting Summarizer</p>
+        <h1 class="hero__headline">
+          <span class="word">Turn</span> <span class="word">Meetings</span> <span class="word">into</span>
+          <span class="word">Clear</span> <span class="word">Summaries</span> <span class="word">&amp;</span>
+          <span class="word">Actions</span>
+        </h1>
+        <p class="hero__subhead">
+          Upload a recording and get a full transcript, a concise summary, key decisions,
+          and action items — automatically.
+        </p>
+        <a href="#upload" class="btn btn--primary btn--glow">Upload a meeting</a>
+      </div>
+
+      <button type="button" class="scroll-cue" aria-label="Scroll to upload">
+        <span class="scroll-cue__chevron" aria-hidden="true"></span>
+      </button>
+    </section>
+
+    <!-- ============== UPLOAD ============== -->
+    <section id="upload" class="upload">
+      <div class="section-heading">
+        <h2>Upload your meeting</h2>
+        <p>MP3, WAV, M4A, or WEBM — up to 50MB.</p>
+      </div>
+
+      <form id="upload-form" class="upload-card" novalidate>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-describedby="dropzone-hint">
+          <input type="file" id="audio-input" name="audio" accept=".mp3,.wav,.m4a,.webm,audio/*" class="dropzone__input" hidden>
+          <svg class="dropzone__icon" width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 16V4M12 4L7 9M12 4l5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="dropzone__title">Drag &amp; drop your audio file here</p>
+          <p class="dropzone__hint" id="dropzone-hint">or click to browse</p>
+        </div>
+
+        <div class="file-preview" id="file-preview" hidden>
+          <span class="file-preview__icon" aria-hidden="true">&#9835;</span>
+          <div class="file-preview__meta">
+            <p class="file-preview__name" id="file-preview-name">interview_call.mp3</p>
+            <p class="file-preview__size" id="file-preview-size">14.2 MB</p>
+          </div>
+          <button type="button" class="file-preview__remove" id="file-preview-remove" aria-label="Remove selected file">&times;</button>
+        </div>
+
+        <p class="upload-error" id="upload-error" role="alert" hidden></p>
+
+        <button type="submit" class="btn btn--primary" id="upload-submit" disabled>Summarize meeting</button>
+      </form>
+    </section>
+
+    <!-- ============== PROCESSING ============== -->
+    <section id="processing" class="processing">
+      <div class="equalizer" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="processing__status" id="processing-status">Uploading&hellip;</p>
+    </section>
+
+    <!-- ============== RESULTS ============== -->
+    <section id="results" class="results">
+      <div class="section-heading">
+        <h2>Meeting results</h2>
+        <p id="results-meta">Meeting on August 22, 2026 &middot; 13m 32s</p>
+      </div>
+
+      <!-- Transcript -->
+      <div class="panel transcript-panel">
+        <h3 class="panel__title">Transcript</h3>
+        <ol class="transcript" id="transcript-list">
+          <li class="transcript__row">
+            <span class="transcript__avatar" data-speaker="1" aria-hidden="true">S1</span>
+            <div class="transcript__body">
+              <div class="transcript__meta">
+                <span class="transcript__speaker">Speaker 1</span>
+                <span class="transcript__time">00:00</span>
+              </div>
+              <p class="transcript__text">Let's start with the roadmap review for Q3.</p>
+            </div>
+          </li>
+          <li class="transcript__row">
+            <span class="transcript__avatar" data-speaker="2" aria-hidden="true">S2</span>
+            <div class="transcript__body">
+              <div class="transcript__meta">
+                <span class="transcript__speaker">Speaker 2</span>
+                <span class="transcript__time">00:05</span>
+              </div>
+              <p class="transcript__text">Sure — I think billing should be the top priority this quarter.</p>
+            </div>
+          </li>
+          <li class="transcript__row">
+            <span class="transcript__avatar" data-speaker="1" aria-hidden="true">S1</span>
+            <div class="transcript__body">
+              <div class="transcript__meta">
+                <span class="transcript__speaker">Speaker 1</span>
+                <span class="transcript__time">00:12</span>
+              </div>
+              <p class="transcript__text">Agreed. Let's also make sure the migration doc is ready before the freeze.</p>
+            </div>
+          </li>
+          <li class="transcript__row">
+            <span class="transcript__avatar" data-speaker="2" aria-hidden="true">S2</span>
+            <div class="transcript__body">
+              <div class="transcript__meta">
+                <span class="transcript__speaker">Speaker 2</span>
+                <span class="transcript__time">00:19</span>
+              </div>
+              <p class="transcript__text">I'll have a draft ready by end of next week.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="results-grid">
+        <!-- Summary -->
+        <div class="panel summary-panel">
+          <h3 class="panel__title">Summary</h3>
+          <p class="summary-panel__text" id="summary-text">
+            The team reviewed Q3 roadmap priorities and agreed to focus on the billing
+            redesign ahead of the upcoming feature freeze. They discussed timeline risk
+            around the data migration and agreed a draft plan should be ready before
+            the next sync.
+          </p>
+        </div>
+
+        <!-- Decisions -->
+        <div class="panel decisions-panel">
+          <h3 class="panel__title">Key decisions</h3>
+          <ul class="decisions-list" id="decisions-list">
+            <li class="decisions-list__item">
+              <span class="decisions-list__check" aria-hidden="true">&check;</span>
+              Ship the billing redesign before the Q4 freeze.
+            </li>
+            <li class="decisions-list__item">
+              <span class="decisions-list__check" aria-hidden="true">&check;</span>
+              Prioritize the data migration plan over new feature work this sprint.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Action Items -->
+        <div class="panel actions-panel">
+          <h3 class="panel__title">Action items</h3>
+          <ul class="actions-list" id="actions-list">
+            <li class="actions-list__item">
+              <div class="actions-list__task">Draft the data migration plan</div>
+              <div class="actions-list__meta">
+                <span class="actions-list__owner">Priya</span>
+                <span class="actions-list__due">Due Aug 29</span>
+              </div>
+            </li>
+            <li class="actions-list__item">
+              <div class="actions-list__task">Circulate the billing redesign spec for review</div>
+              <div class="actions-list__meta">
+                <span class="actions-list__owner">Jordan</span>
+                <span class="actions-list__due">Due Sep 2</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== PAST MEETINGS ============== -->
+    <section id="past-meetings" class="past-meetings">
+      <div class="section-heading">
+        <h2>Past meetings</h2>
+      </div>
+      <div class="past-meetings__row" id="past-meetings-row">
+        <button type="button" class="meeting-card">
+          <span class="meeting-card__title">Q3 Roadmap Sync</span>
+          <span class="meeting-card__date">Aug 22, 2026</span>
+        </button>
+        <button type="button" class="meeting-card">
+          <span class="meeting-card__title">Billing Redesign Kickoff</span>
+          <span class="meeting-card__date">Aug 15, 2026</span>
+        </button>
+        <button type="button" class="meeting-card">
+          <span class="meeting-card__title">Weekly Standup</span>
+          <span class="meeting-card__date">Aug 8, 2026</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Built for the Meeting Summarizer assignment &mdash; transcript &amp; summary generated with OpenAI Whisper + Gemini.</p>
+  </footer>
+
+  <script src="js/api.js" defer></script>
+  <script src="js/upload.js" defer></script>
+  <script src="js/render.js" defer></script>
+  <script src="js/pastMeetings.js" defer></script>
+  <script src="js/animations.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>
