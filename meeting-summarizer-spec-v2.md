@@ -149,24 +149,26 @@ Errors: `400` (missing/invalid/too-large file), `502` (Whisper failure), `502` (
 **`GET /api/meetings`** → `[{ id, title, createdAt, durationSec }]`.
 **`GET /api/meetings/:id`** → full object or `404`.
 
-### ASR integration — OpenAI Whisper, no SDK
+### ASR integration — Groq Whisper, no SDK
 
 ```js
 // transcriptionService.js (sketch)
 const form = new FormData();
 form.append('file', new Blob([audioBuffer]), filename);
-form.append('model', 'whisper-1');
+form.append('model', process.env.GROQ_MODEL || 'whisper-large-v3');
 form.append('response_format', 'verbose_json');
 form.append('timestamp_granularities[]', 'word');
 
-const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
   method: 'POST',
-  headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+  headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
   body: form,
 });
 const { words, duration } = await res.json();
 // heuristic: new speaker whenever gap between word.end and next word.start > 1.2s
 ```
+
+Groq's endpoint is OpenAI-compatible in request shape, and `response_format: 'verbose_json'` + `timestamp_granularities[]: 'word'` is the same combination OpenAI requires for word-level timestamps. The response shape above (`words: [{ word, start, end }]` plus a top-level `duration`) is assumed to match OpenAI's, per Groq's docs — but this hasn't been confirmed against a real Groq response yet (no key to test with), so verify it during the first real end-to-end run rather than trusting it permanently.
 
 This uses Node 18+'s global `fetch`/`FormData`/`Blob` — zero dependencies for the ASR call itself. The heuristic speaker split is a plain function over the `words` array, alternating "Speaker 1"/"Speaker 2" labels — clearly documented in the README as an approximation, not true diarization.
 
@@ -222,16 +224,24 @@ Typed errors (`ValidationError`, `TranscriptionError`, `SummaryGenerationError`)
 | Variable | Purpose |
 |---|---|
 | `PORT` | Express port (serves frontend + API) |
-| `OPENAI_API_KEY` | Whisper transcription |
+| `GROQ_API_KEY` | Groq Whisper transcription |
+| `GROQ_MODEL` | Groq Whisper model name (defaults to `whisper-large-v3`) |
 | `GEMINI_API_KEY` | summary/decisions/action-item generation |
+| `GEMINI_MODEL` | Gemini model name (defaults to `gemini-2.5-flash`) |
 | `MAX_UPLOAD_MB` | multer file-size limit |
 
 **`.env.example`:**
 ```
 PORT=3000
-OPENAI_API_KEY=your_openai_key_here
+GROQ_API_KEY=your_groq_key_here
+# Swap to whisper-large-v3-turbo for lower cost/latency at a small accuracy tradeoff.
+GROQ_MODEL=whisper-large-v3
 GEMINI_API_KEY=your_gemini_key_here
-MAX_UPLOAD_MB=50
+# Verify this is current at https://ai.google.dev/gemini-api/docs/models before relying on it.
+GEMINI_MODEL=gemini-2.5-flash
+# Matches Groq's free-tier file size cap. Raise this back up if you're on
+# their paid dev tier (100MB cap).
+MAX_UPLOAD_MB=25
 ```
 
 **`package.json` (backend) — start script for native env loading:**

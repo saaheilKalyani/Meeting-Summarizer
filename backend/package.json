@@ -2,7 +2,7 @@
   "name": "meeting-summarizer-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Backend for Meeting Summarizer: Express API that transcribes meeting audio (OpenAI Whisper) and extracts summary/decisions/action items (Gemini).",
+  "description": "Backend for Meeting Summarizer: Express API that transcribes meeting audio (Groq Whisper) and extracts summary/decisions/action items (Gemini).",
   "main": "server.js",
   "scripts": {
     "start": "node --env-file=.env server.js"
